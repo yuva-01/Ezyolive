@@ -1,0 +1,498 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
+import { useTheme } from '../../context/ThemeContext';
+import Button from '../../components/ui/Button';
+import { 
+  CalendarIcon, 
+  UserIcon, 
+  VideoCameraIcon, 
+  DocumentTextIcon,
+  ChartBarIcon,
+  ShieldCheckIcon,
+  CurrencyDollarIcon,
+  ChevronDownIcon,
+  ArrowRightIcon,
+  CheckCircleIcon
+} from '@heroicons/react/24/outline';
+
+const Home = () => {
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [activeFaq, setActiveFaq] = useState(null);
+  const [isVisible, setIsVisible] = useState({});
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const statsRef = useRef(null);
+  
+  // Theme
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+  
+  // Handle scroll effects (scroll-to-top button)
+  useEffect(() => {
+    const handleScroll = () => {
+      // Show scroll-to-top button when scrolled down enough
+      if (window.scrollY > 500) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  
+  // Function to scroll to top
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  
+  // Animation for counting stats
+  const [counts, setCounts] = useState({
+    practices: 0,
+    patients: 0,
+    appointments: 0,
+    satisfaction: 0
+  });
+  
+  // Intersection observer for scroll animations
+  useEffect(() => {
+    // Add smooth scrolling behavior to the entire page
+    document.documentElement.style.scrollBehavior = 'smooth';
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setIsVisible(prev => ({ ...prev, [entry.target.id]: true }));
+          
+          // Start counting animation when stats section is visible
+          if (entry.target.id === 'stats-section') {
+            const interval = setInterval(() => {
+              setCounts(prev => ({
+                practices: prev.practices >= 2500 ? 2500 : prev.practices + 50,
+                patients: prev.patients >= 500000 ? 500000 : prev.patients + 10000,
+                appointments: prev.appointments >= 1500000 ? 1500000 : prev.appointments + 30000,
+                satisfaction: prev.satisfaction >= 98 ? 98 : prev.satisfaction + 2
+              }));
+            }, 50);
+            
+            return () => clearInterval(interval);
+          }
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -10% 0px' }); // Add rootMargin for earlier trigger
+    
+    // Elements to observe
+    const sections = document.querySelectorAll('.animate-on-scroll');
+    sections.forEach(section => observer.observe(section));
+    
+    if (statsRef.current) {
+      observer.observe(statsRef.current);
+    }
+    
+    return () => {
+      sections.forEach(section => observer.unobserve(section));
+      if (statsRef.current) {
+        observer.unobserve(statsRef.current);
+      }
+    };
+  }, []);
+
+  // FAQs data
+  const faqItems = [
+    {
+      question: "How secure is my patient data?",
+      answer: "Absolutely. We maintain the highest standards of security and compliance. All data is encrypted end-to-end, and we conduct regular security audits to ensure your patient information is always protected."
+    },
+    {
+      question: "What kind of support do you offer?",
+      answer: "We offer 24/7 technical support via chat, email, and phone. Our team of healthcare IT specialists understands both the technical and clinical aspects of your practice."
+    },
+    {
+      question: "Do you offer training for my staff?",
+      answer: "Yes, comprehensive training is included with every plan. We provide live virtual sessions, on-demand videos, and detailed documentation to ensure your team gets the most out of EzyOlive."
+    }
+  ];
+  
+  const toggleFaq = (index) => {
+    setActiveFaq(activeFaq === index ? null : index);
+  };
+  
+  return (
+    <>
+      {/* Hero section */}
+      <div className={`relative ${isDark ? 'bg-gray-900' : ''}`}>
+        <div className="absolute inset-0 overflow-hidden">
+          <div className={`h-full w-full ${isDark ? 'opacity-10' : 'opacity-5'}`} style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/cubes.png")' }}></div>
+          <div className={`absolute bottom-0 left-0 right-0 h-1/3 ${isDark ? 'bg-gradient-to-t from-gray-900' : 'bg-gradient-to-t from-white'}`}></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="pt-10 pb-16 sm:pt-16 lg:pt-12 lg:pb-24">
+            <div className="lg:grid lg:grid-cols-12 lg:gap-8">
+              <div className="animate-on-scroll" id="hero-content">
+                <div className="lg:col-span-6">
+                  <h1 className="mt-4 text-4xl tracking-tight font-extrabold sm:mt-5 sm:text-5xl lg:mt-6 xl:text-6xl">
+                    <span className={`block ${isDark ? 'text-white' : 'text-gray-900'}`}>Modern Healthcare</span>
+                    <span className="block text-blue-600">Management Solution</span>
+                  </h1>
+                  <p className={`mt-3 text-base sm:mt-5 sm:text-xl lg:text-lg xl:text-xl ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                    Streamline your medical practice with our all-in-one platform designed for healthcare providers.
+                    From appointments to patient records, EzyOlive makes healthcare management simple and efficient.
+                  </p>
+                  <div className="mt-8 sm:mt-10">
+                    <div className="space-y-4 sm:space-y-0 sm:mx-auto sm:inline-grid sm:grid-cols-2 sm:gap-5">
+                      <Link
+                        to="/register"
+                        className="flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-300"
+                      >
+                        Get Started
+                      </Link>
+                      <Link
+                        to="/features"
+                        className={`flex items-center justify-center px-4 py-3 border text-base font-medium rounded-md ${
+                          isDark 
+                            ? 'text-gray-300 border-gray-700 hover:bg-gray-800'
+                            : 'text-gray-700 border-gray-300 hover:bg-gray-100'
+                        } transition-colors duration-300`}
+                      >
+                        View Features
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-12 lg:mt-0 lg:ml-auto animate-on-scroll" id="hero-image">
+                <div className="pl-4 -mr-48 sm:pl-6 md:-mr-16 lg:px-0 lg:m-0 lg:relative lg:h-full lg:col-span-6">
+                  <div className={`w-full rounded-xl shadow-xl ring-1 overflow-hidden lg:absolute lg:right-0 lg:h-full lg:w-auto lg:max-w-none ${
+                    isDark ? 'ring-gray-700' : 'ring-gray-400/10'
+                  }`}>
+                    <img
+                      className="w-full lg:h-full lg:w-auto"
+                      src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
+                      alt="EzyOlive healthcare dashboard"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Features section */}
+      <div className={`py-16 sm:py-24 lg:py-32 ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className={`text-base font-semibold uppercase tracking-wide ${
+              isDark ? 'text-blue-400' : 'text-blue-600'
+            }`}>Comprehensive Solution</h2>
+            <p className={`mt-1 text-4xl font-extrabold sm:text-5xl sm:tracking-tight lg:text-6xl ${
+              isDark ? 'text-white' : 'text-gray-900'
+            }`}>Everything you need</p>
+            <p className={`max-w-xl mt-5 mx-auto text-xl ${
+              isDark ? 'text-gray-300' : 'text-gray-500'
+            }`}>
+              Designed by healthcare professionals for healthcare professionals.
+            </p>
+          </div>
+
+          <div className="mt-20">
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {/* Feature 1 */}
+              <div className={`animate-on-scroll relative pt-8 ${
+                isDark ? 'bg-gray-800' : 'bg-gray-50'
+              } rounded-lg px-6 pb-8 transition-transform duration-500 hover:-translate-y-2`} id="feature-1">
+                <div className={`absolute top-0 left-1/2 transform -translate-y-1/2 -translate-x-1/2 p-3 rounded-lg ${
+                  isDark ? 'bg-blue-900' : 'bg-blue-100'
+                }`}>
+                  <CalendarIcon className={`h-8 w-8 ${isDark ? 'text-blue-300' : 'text-blue-600'}`} aria-hidden="true" />
+                </div>
+                <h3 className={`mt-8 text-xl font-medium ${isDark ? 'text-white' : 'text-gray-900'} text-center`}>
+                  Appointment Management
+                </h3>
+                <p className={`mt-4 text-base ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                  Schedule, reschedule, and manage appointments with our intuitive calendar interface. Send automated reminders to reduce no-shows.
+                </p>
+              </div>
+
+              {/* Feature 2 */}
+              <div className={`animate-on-scroll relative pt-8 ${
+                isDark ? 'bg-gray-800' : 'bg-gray-50'
+              } rounded-lg px-6 pb-8 transition-transform duration-500 hover:-translate-y-2`} id="feature-2">
+                <div className={`absolute top-0 left-1/2 transform -translate-y-1/2 -translate-x-1/2 p-3 rounded-lg ${
+                  isDark ? 'bg-indigo-900' : 'bg-indigo-100'
+                }`}>
+                  <DocumentTextIcon className={`h-8 w-8 ${isDark ? 'text-indigo-300' : 'text-indigo-600'}`} aria-hidden="true" />
+                </div>
+                <h3 className={`mt-8 text-xl font-medium ${isDark ? 'text-white' : 'text-gray-900'} text-center`}>
+                  Electronic Health Records
+                </h3>
+                <p className={`mt-4 text-base ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                  Maintain comprehensive patient records with our secure EHR system. Access patient history, medications, and tests in one place.
+                </p>
+              </div>
+
+              {/* Feature 3 */}
+              <div className={`animate-on-scroll relative pt-8 ${
+                isDark ? 'bg-gray-800' : 'bg-gray-50'
+              } rounded-lg px-6 pb-8 transition-transform duration-500 hover:-translate-y-2`} id="feature-3">
+                <div className={`absolute top-0 left-1/2 transform -translate-y-1/2 -translate-x-1/2 p-3 rounded-lg ${
+                  isDark ? 'bg-green-900' : 'bg-green-100'
+                }`}>
+                  <VideoCameraIcon className={`h-8 w-8 ${isDark ? 'text-green-300' : 'text-green-600'}`} aria-hidden="true" />
+                </div>
+                <h3 className={`mt-8 text-xl font-medium ${isDark ? 'text-white' : 'text-gray-900'} text-center`}>
+                  Telehealth Integration
+                </h3>
+                <p className={`mt-4 text-base ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                  Conduct virtual visits with integrated video calls. Share screens, send files, and maintain the same level of care remotely.
+                </p>
+              </div>
+
+              {/* Feature 4 */}
+              <div className={`animate-on-scroll relative pt-8 ${
+                isDark ? 'bg-gray-800' : 'bg-gray-50'
+              } rounded-lg px-6 pb-8 transition-transform duration-500 hover:-translate-y-2`} id="feature-4">
+                <div className={`absolute top-0 left-1/2 transform -translate-y-1/2 -translate-x-1/2 p-3 rounded-lg ${
+                  isDark ? 'bg-purple-900' : 'bg-purple-100'
+                }`}>
+                  <UserIcon className={`h-8 w-8 ${isDark ? 'text-purple-300' : 'text-purple-600'}`} aria-hidden="true" />
+                </div>
+                <h3 className={`mt-8 text-xl font-medium ${isDark ? 'text-white' : 'text-gray-900'} text-center`}>
+                  Patient Portal
+                </h3>
+                <p className={`mt-4 text-base ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                  Empower patients with a secure portal to request appointments, access records, and communicate with their providers.
+                </p>
+              </div>
+
+              {/* Feature 5 */}
+              <div className={`animate-on-scroll relative pt-8 ${
+                isDark ? 'bg-gray-800' : 'bg-gray-50'
+              } rounded-lg px-6 pb-8 transition-transform duration-500 hover:-translate-y-2`} id="feature-5">
+                <div className={`absolute top-0 left-1/2 transform -translate-y-1/2 -translate-x-1/2 p-3 rounded-lg ${
+                  isDark ? 'bg-red-900' : 'bg-red-100'
+                }`}>
+                  <ChartBarIcon className={`h-8 w-8 ${isDark ? 'text-red-300' : 'text-red-600'}`} aria-hidden="true" />
+                </div>
+                <h3 className={`mt-8 text-xl font-medium ${isDark ? 'text-white' : 'text-gray-900'} text-center`}>
+                  Analytics & Reporting
+                </h3>
+                <p className={`mt-4 text-base ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                  Gain insights with comprehensive analytics. Track practice performance, patient demographics, and financial metrics.
+                </p>
+              </div>
+
+              {/* Feature 6 */}
+              <div className={`animate-on-scroll relative pt-8 ${
+                isDark ? 'bg-gray-800' : 'bg-gray-50'
+              } rounded-lg px-6 pb-8 transition-transform duration-500 hover:-translate-y-2`} id="feature-6">
+                <div className={`absolute top-0 left-1/2 transform -translate-y-1/2 -translate-x-1/2 p-3 rounded-lg ${
+                  isDark ? 'bg-yellow-900' : 'bg-yellow-100'
+                }`}>
+                  <CurrencyDollarIcon className={`h-8 w-8 ${isDark ? 'text-yellow-300' : 'text-yellow-600'}`} aria-hidden="true" />
+                </div>
+                <h3 className={`mt-8 text-xl font-medium ${isDark ? 'text-white' : 'text-gray-900'} text-center`}>
+                  Billing & Payments
+                </h3>
+                <p className={`mt-4 text-base ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                  Simplify billing with insurance verification, claims submission, and payment processing all in one system.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-20 text-center">
+            <Link
+              to="/features"
+              className={`inline-flex items-center px-6 py-3 text-base font-medium rounded-md shadow-sm ${
+                isDark 
+                  ? 'text-white bg-blue-700 hover:bg-blue-600' 
+                  : 'text-white bg-blue-600 hover:bg-blue-700'
+              } transition-colors duration-300`}
+            >
+              View All Features
+              <ArrowRightIcon className="ml-2 h-5 w-5" />
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats section */}
+      <div ref={statsRef} id="stats-section" className={`${
+        isDark ? 'bg-blue-900' : 'bg-blue-700'
+      } py-16`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Stat 1 */}
+            <div className="text-center">
+              <p className="text-5xl font-extrabold text-white">
+                {counts.practices.toLocaleString()}+
+              </p>
+              <p className="mt-2 text-xl font-medium text-blue-100">Medical Practices</p>
+            </div>
+            
+            {/* Stat 2 */}
+            <div className="text-center">
+              <p className="text-5xl font-extrabold text-white">
+                {counts.patients.toLocaleString()}+
+              </p>
+              <p className="mt-2 text-xl font-medium text-blue-100">Patients Served</p>
+            </div>
+            
+            {/* Stat 3 */}
+            <div className="text-center">
+              <p className="text-5xl font-extrabold text-white">
+                {counts.appointments.toLocaleString()}+
+              </p>
+              <p className="mt-2 text-xl font-medium text-blue-100">Appointments Booked</p>
+            </div>
+            
+            {/* Stat 4 */}
+            <div className="text-center">
+              <p className="text-5xl font-extrabold text-white">
+                {counts.satisfaction}%
+              </p>
+              <p className="mt-2 text-xl font-medium text-blue-100">Client Satisfaction</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* FAQ section */}
+      <div className={`${isDark ? 'bg-gray-900' : 'bg-white'} py-16 sm:py-24`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className={`text-3xl font-extrabold text-center ${
+            isDark ? 'text-white' : 'text-gray-900'
+          } sm:text-4xl`}>
+            Frequently Asked Questions
+          </h2>
+          <div className="mt-12 max-w-3xl mx-auto">
+            <div className="space-y-6">
+              {faqItems.map((item, index) => (
+                <div 
+                  key={index} 
+                  className={`${
+                    isDark 
+                      ? 'bg-gray-800 hover:bg-gray-700' 
+                      : 'bg-gray-50 hover:bg-gray-100'
+                  } p-6 rounded-lg transition-colors duration-300`}
+                >
+                  <button
+                    className="flex justify-between items-center w-full text-left focus:outline-none"
+                    onClick={() => toggleFaq(index)}
+                  >
+                    <h3 className={`text-lg font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                      {item.question}
+                    </h3>
+                    <ChevronDownIcon 
+                      className={`h-5 w-5 ${isDark ? 'text-gray-400' : 'text-gray-500'} transform ${
+                        activeFaq === index ? 'rotate-180' : 'rotate-0'
+                      } transition-transform duration-300`} 
+                    />
+                  </button>
+                  {activeFaq === index && (
+                    <div className="mt-4 animate-fadeIn">
+                      <p className={`text-base ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                        {item.answer}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-10 text-center">
+              <Link
+                to="/contact"
+                className={`inline-flex items-center px-4 py-2 text-base font-medium rounded-md ${
+                  isDark 
+                    ? 'text-blue-300 hover:text-blue-200' 
+                    : 'text-blue-600 hover:text-blue-500'
+                }`}
+              >
+                Have more questions? Contact us
+                <ArrowRightIcon className="ml-2 h-5 w-5" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Call to action section */}
+      <div className={`relative ${isDark ? 'bg-blue-900' : 'bg-blue-600'} overflow-hidden`}>
+        {/* Background decorative elements */}
+        <div className="hidden lg:block lg:absolute lg:inset-0">
+          <svg
+            className="absolute top-0 left-1/2 transform translate-x-64 -translate-y-8"
+            width="640"
+            height="784"
+            fill="none"
+            viewBox="0 0 640 784"
+          >
+            <defs>
+              <pattern
+                id="9ebea6f4-a1f5-4d96-8c4e-4c2abf658047"
+                x="118"
+                y="0"
+                width="20"
+                height="20"
+                patternUnits="userSpaceOnUse"
+              >
+                <rect x="0" y="0" width="4" height="4" className="text-blue-500" fill="currentColor" />
+              </pattern>
+            </defs>
+            <rect y="72" width="640" height="640" className="text-blue-800" fill="currentColor" />
+            <rect x="118" width="404" height="784" fill="url(#9ebea6f4-a1f5-4d96-8c4e-4c2abf658047)" />
+          </svg>
+        </div>
+        
+        <div className="relative py-16 sm:py-24 lg:py-32">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-extrabold text-white tracking-tight sm:text-4xl">
+                Ready to streamline your practice?
+              </h2>
+              <p className="mt-4 text-xl text-blue-100 max-w-2xl mx-auto">
+                Join thousands of healthcare providers who trust EzyOlive to run their practice more efficiently.
+              </p>
+              <div className="mt-8 flex justify-center">
+                <Link
+                  to="/register"
+                  className="px-5 py-3 border border-transparent text-base font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50 transition-colors duration-300"
+                >
+                  Start Your Free Trial
+                </Link>
+                <Link
+                  to="/contact"
+                  className="ml-4 px-5 py-3 border border-blue-300 text-base font-medium rounded-md text-white hover:bg-blue-800 transition-colors duration-300"
+                >
+                  Contact Sales
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Scroll to top button */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className={`fixed bottom-6 right-6 p-4 rounded-full shadow-lg ${
+            isDark ? 'bg-blue-700 hover:bg-blue-600' : 'bg-blue-600 hover:bg-blue-500'
+          } text-white transition-all duration-300 z-50 focus:outline-none focus:ring-2 focus:ring-blue-400`}
+          aria-label="Scroll to top"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+          </svg>
+          <span className="sr-only">Scroll to top</span>
+        </button>
+      )}
+    </>
+  );
+};
+
+export default Home;

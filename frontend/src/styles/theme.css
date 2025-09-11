@@ -1,0 +1,198 @@
+/* Theme Variables */
+
+:root {
+  /* Common variables */
+  --transition-speed: 0.3s;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* Brand colors - consistent across themes */
+  --color-primary-50: 238, 242, 255;
+  --color-primary-100: 224, 231, 255;
+  --color-primary-200: 199, 210, 254;
+  --color-primary-300: 165, 180, 252;
+  --color-primary-400: 129, 140, 248;
+  --color-primary-500: 99, 102, 241;
+  --color-primary-600: 79, 70, 229;
+  --color-primary-700: 67, 56, 202;
+  --color-primary-800: 55, 48, 163;
+  --color-primary-900: 49, 46, 129;
+  
+  --color-secondary-50: 240, 253, 244;
+  --color-secondary-100: 220, 252, 231;
+  --color-secondary-200: 187, 247, 208;
+  --color-secondary-300: 134, 239, 172;
+  --color-secondary-400: 74, 222, 128;
+  --color-secondary-500: 34, 197, 94;
+  --color-secondary-600: 22, 163, 74;
+  --color-secondary-700: 21, 128, 61;
+  --color-secondary-800: 22, 101, 52;
+  --color-secondary-900: 20, 83, 45;
+}
+
+/* Light Theme (default) */
+.light-theme {
+  /* Text colors */
+  --color-text-primary: 15, 23, 42;
+  --color-text-secondary: 71, 85, 105;
+  --color-text-tertiary: 148, 163, 184;
+  --color-text-inverted: 255, 255, 255;
+  
+  /* Background colors */
+  --color-bg-primary: 255, 255, 255;
+  --color-bg-secondary: 248, 250, 252;
+  --color-bg-tertiary: 241, 245, 249;
+  --color-bg-inverted: 15, 23, 42;
+  
+  /* Border colors */
+  --color-border-primary: 226, 232, 240;
+  --color-border-secondary: 203, 213, 225;
+  
+  /* Status colors */
+  --color-success: 22, 163, 74;
+  --color-warning: 234, 179, 8;
+  --color-danger: 220, 38, 38;
+  --color-info: 59, 130, 246;
+}
+
+/* Dark Theme */
+.dark-theme {
+  /* Text colors */
+  --color-text-primary: 248, 250, 252;
+  --color-text-secondary: 226, 232, 240;
+  --color-text-tertiary: 203, 213, 225;
+  --color-text-inverted: 15, 23, 42;
+  
+  /* Background colors */
+  --color-bg-primary: 15, 23, 42;
+  --color-bg-secondary: 30, 41, 59;
+  --color-bg-tertiary: 51, 65, 85;
+  --color-bg-inverted: 255, 255, 255;
+  
+  /* Border colors */
+  --color-border-primary: 51, 65, 85;
+  --color-border-secondary: 71, 85, 105;
+  
+  /* Status colors */
+  --color-success: 34, 197, 94;
+  --color-warning: 250, 204, 21;
+  --color-danger: 239, 68, 68;
+  --color-info: 96, 165, 250;
+}
+
+/* Utility classes for text colors */
+.text-primary {
+  color: rgb(var(--color-text-primary));
+}
+
+.text-secondary {
+  color: rgb(var(--color-text-secondary));
+}
+
+.text-tertiary {
+  color: rgb(var(--color-text-tertiary));
+}
+
+.text-inverted {
+  color: rgb(var(--color-text-inverted));
+}
+
+/* Utility classes for background colors */
+.bg-primary {
+  background-color: rgb(var(--color-bg-primary));
+}
+
+.bg-secondary {
+  background-color: rgb(var(--color-bg-secondary));
+}
+
+.bg-tertiary {
+  background-color: rgb(var(--color-bg-tertiary));
+}
+
+.bg-inverted {
+  background-color: rgb(var(--color-bg-inverted));
+}
+
+/* Utility classes for border colors */
+.border-primary {
+  border-color: rgb(var(--color-border-primary));
+}
+
+.border-secondary {
+  border-color: rgb(var(--color-border-secondary));
+}
+
+/* Custom card styles with theme support */
+.card {
+  background-color: rgb(var(--color-bg-primary));
+  border: 1px solid rgb(var(--color-border-primary));
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow);
+  transition: box-shadow var(--transition-speed), transform var(--transition-speed);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* Custom button styles with theme support */
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: all var(--transition-speed);
+}
+
+.btn-primary {
+  background-color: rgb(var(--color-primary-600));
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: rgb(var(--color-primary-700));
+}
+
+.btn-secondary {
+  background-color: rgb(var(--color-secondary-600));
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: rgb(var(--color-secondary-700));
+}
+
+/* Input styles with theme support */
+.input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-width: 1px;
+  border-color: rgb(var(--color-border-primary));
+  border-radius: 0.375rem;
+  background-color: rgb(var(--color-bg-primary));
+  color: rgb(var(--color-text-primary));
+  transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+.input:focus {
+  outline: none;
+  border-color: rgb(var(--color-primary-500));
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-500), 0.2);
+}
+
+/* Dark mode support for Tailwind */
+.dark .dark\:text-white {
+  color: rgb(var(--color-text-primary));
+}
+
+.dark .dark\:bg-gray-800 {
+  background-color: rgb(var(--color-bg-primary));
+}
+
+.dark .dark\:border-gray-700 {
+  border-color: rgb(var(--color-border-primary));
+}
