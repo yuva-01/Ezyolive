@@ -138,4 +138,10 @@ API documentation is available at `/api-docs` when the backend server is running
 
 ## License
 
-This project is licensed under the MIT License.
+Copyright (c) 2025 Siddharth, Yash, Yuva and Arnav
+
+All rights reserved.  
+This software and associated files are the proprietary property of Siddharth, Yash, Yuva and Arnav.  
+Unauthorized copying, modification, distribution, or use of this software,  
+via any medium, is strictly prohibited without prior written permission.  
+
