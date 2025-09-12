@@ -38,16 +38,15 @@ exports.signup = async (req, res, next) => {
       lastName,
       email,
       password,
-      passwordConfirm,
+     confirmPassword,
       role,
-      phoneNumber,
       dateOfBirth,
       gender,
       address
     } = req.body;
 
     // Basic validation
-    if (!firstName || !lastName || !email || !password || !passwordConfirm) {
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
       return res.status(400).json({
         status: 'fail',
         message: 'Please provide all required fields'
@@ -63,9 +62,8 @@ exports.signup = async (req, res, next) => {
       lastName,
       email,
       password,
-      passwordConfirm,
+      confirmPassword,
       role: userRole,
-      phoneNumber,
       dateOfBirth,
       gender,
       address
@@ -166,7 +164,7 @@ exports.updatePassword = async (req, res, next) => {
 
     // 3) If so, update password
     user.password = req.body.password;
-    user.passwordConfirm = req.body.passwordConfirm;
+    user.confirmPassword = req.body.confirmPassword;
     await user.save();
 
     // 4) Log password change
@@ -248,7 +246,7 @@ exports.resetPassword = async (req, res, next) => {
       });
     }
     user.password = req.body.password;
-    user.passwordConfirm = req.body.passwordConfirm;
+    user.confirmPassword = req.body.confirmPassword;
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     await user.save();

@@ -20,6 +20,7 @@ export const register = createAsyncThunk(
     try {
       return await authService.register(userData);
     } catch (error) {
+      console.log('Registration error:', error);
       const message =
         (error.response &&
           error.response.data &&

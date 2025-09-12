@@ -1,6 +1,6 @@
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
-import { isInDemoMode, authenticateDemo, registerDemo } from '../../utils/demoUtils';
+import { isInDemoMode, authenticateDemo, registerDemo, enableDemo, disableDemo } from '../../utils/demoUtils';
 
 const API_URL = '/api/auth/';
 
@@ -14,6 +14,7 @@ const register = async (userData) => {
       localStorage.setItem('user', JSON.stringify(demoResponse));
       // Set token in axios default headers for all requests
       axios.defaults.headers.common['Authorization'] = `Bearer ${demoResponse.token}`;
+      enableDemo();
     }
     
     return demoResponse;
@@ -21,12 +22,13 @@ const register = async (userData) => {
   
   // Real API call
   const response = await axios.post(API_URL + 'signup', userData);
-
+  console.log('Registration response:', response);
   if (response.data) {
     localStorage.setItem('user', JSON.stringify(response.data));
     // Set token in axios default headers for all requests
     axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
   }
+
 
   return response.data;
 };
@@ -55,6 +57,7 @@ const login = async (userData) => {
     
     // Set token in axios default headers for all requests
     axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+    enableDemo();
   }
 
   return response.data;
@@ -63,6 +66,7 @@ const login = async (userData) => {
 // Logout user
 const logout = async () => {
   // Clean up regardless of demo mode
+  disableDemo();
   localStorage.removeItem('user');
   delete axios.defaults.headers.common['Authorization'];
   

@@ -1,3 +1,5 @@
+// src/utils/demoUtils.js
+
 // Demo user credentials for testing purposes
 export const DEMO_USERS = [
   {
@@ -29,40 +31,42 @@ export const DEMO_USERS = [
   }
 ];
 
-/**
- * Check if the application should use demo mode (no backend)
- */
-export const isInDemoMode = () => {
-  return false; // Set to false to disable demo mode
-};
+export const DEMO_KEY = 'EZYOLIVE_DEMO_MODE';
+
+// Demo mode toggles
+export const enableDemo = () => localStorage.setItem(DEMO_KEY, 'true');
+export const disableDemo = () => localStorage.removeItem(DEMO_KEY);
+export const isInDemoMode = () => localStorage.getItem(DEMO_KEY) === 'true';
 
 /**
  * Authenticate user with demo credentials
+ * Returns { token, user, message } or null
  */
 export const authenticateDemo = (email, password) => {
-  const user = DEMO_USERS.find(u => u.email === email && u.password === password);
-  if (user) {
-    // Return a mock response similar to what the API would return
-    return {
-      user: {
-        id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        role: user.role
-      },
-      token: 'demo-jwt-token-' + Date.now(),
-      message: 'Login successful in demo mode'
-    };
-  }
-  return null;
+  const found = DEMO_USERS.find(u => u.email === email && u.password === password);
+  if (!found) return null;
+
+  const user = {
+    id: found.id,
+    firstName: found.firstName,
+    lastName: found.lastName,
+    email: found.email,
+    role: found.role,
+    avatar: found.avatar
+  };
+
+  return {
+    user,
+    token: 'demo-jwt-token-' + Date.now(),
+    message: 'Login successful in demo mode'
+  };
 };
 
 /**
  * Register a demo user
+ * Returns { token, user, message }
  */
 export const registerDemo = (userData) => {
-  // Create a new demo user
   const newUser = {
     id: 'demo-' + Date.now(),
     firstName: userData.firstName,
@@ -71,8 +75,7 @@ export const registerDemo = (userData) => {
     role: 'patient',
     avatar: null
   };
-  
-  // Return mock response
+
   return {
     user: newUser,
     token: 'demo-jwt-token-' + Date.now(),

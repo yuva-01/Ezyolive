@@ -60,6 +60,8 @@ app.use(helmet());
 app.use(xss());
 app.use(mongoSanitize());
 app.use(hpp());
+app.set('trust proxy', 1); // trust first proxy (CRA dev server, nginx, Heroku, etc.)
+
 
 // Rate limiting
 const limiter = rateLimit({
