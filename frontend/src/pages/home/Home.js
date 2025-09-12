@@ -242,9 +242,9 @@ const Home = () => {
                         
                         {/* Main image with subtle border */}
                         <img
-                          className="w-full h-full object-cover rounded-lg z-10 transform transition-transform duration-700 hover:scale-105"
-                          src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
-                          alt="EzyOlive healthcare dashboard"
+                          className="w-full h-full object-cover rounded-lg z-10 transform transition-transform duration-700 hover:scale-105 bg-gray-200"
+                          src="https://plus.unsplash.com/premium_photo-1658506671316-0b293df7c72b?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                          alt="Professional doctor portrait"
                         />
                         
                         {/* Floating elements */}

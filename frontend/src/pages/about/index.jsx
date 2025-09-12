@@ -13,8 +13,8 @@ function About() {
         <div className="about-content">
           <h2>Our Story</h2>
           <p>
-            Exyolive was founded in 2010 with a simple mission: to help businesses grow through innovative technology solutions. 
-            What started as a small team of passionate developers has grown into a global company serving clients across industries.
+            Exyolive was founded in 2025 with a simple mission: to help businesses grow through innovative technology solutions. 
+            What started as a small team of passionate developers .
           </p>
           <p>
             Our journey began when our founders recognized a gap in the market for intuitive, powerful business tools that didn't 
@@ -56,36 +56,36 @@ function About() {
             <div className="team-photo">
               <div className="photo-placeholder"></div>
             </div>
-            <h3>Jane Doe</h3>
+            <h3>Yash</h3>
             <p className="team-title">Chief Executive Officer</p>
-            <p className="team-bio">Jane has over 15 years of experience in technology and business leadership.</p>
+            <p className="team-bio">yash has over 5 years of experience in technology and business leadership.</p>
           </div>
           
           <div className="team-member">
             <div className="team-photo">
               <div className="photo-placeholder"></div>
             </div>
-            <h3>John Smith</h3>
+            <h3>Yuva</h3>
             <p className="team-title">Chief Technology Officer</p>
-            <p className="team-bio">John leads our engineering team with a focus on innovation and quality.</p>
+            <p className="team-bio">yuva leads our engineering team with a focus on innovation and quality.</p>
           </div>
           
           <div className="team-member">
             <div className="team-photo">
               <div className="photo-placeholder"></div>
             </div>
-            <h3>Emily Chen</h3>
+            <h3>Siddharth </h3>
             <p className="team-title">Chief Product Officer</p>
-            <p className="team-bio">Emily ensures our products meet the evolving needs of our customers.</p>
+            <p className="team-bio">Siddharth ensures our products meet the evolving needs of our customers.</p>
           </div>
           
           <div className="team-member">
             <div className="team-photo">
               <div className="photo-placeholder"></div>
             </div>
-            <h3>Michael Johnson</h3>
+            <h3>Arnav</h3>
             <p className="team-title">Chief Marketing Officer</p>
-            <p className="team-bio">Michael drives our brand strategy and customer engagement initiatives.</p>
+            <p className="team-bio">Arnav drives our brand strategy and customer engagement initiatives.</p>
           </div>
         </div>
       </div>

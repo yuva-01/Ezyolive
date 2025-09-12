@@ -103,8 +103,8 @@ function Contact() {
                 <div className="contact-text">
                   <h3 className={`${isDark ? 'text-white' : 'text-gray-800'}`}>Address</h3>
                   <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                    123 Healthcare Blvd, <br />
-                    San Francisco, CA 94107
+                    159B, <br />
+                    New delhi Ashram 
                   </p>
                 </div>
               </div>
@@ -116,7 +116,7 @@ function Contact() {
                 <div className="contact-text">
                   <h3 className={`${isDark ? 'text-white' : 'text-gray-800'}`}>Phone</h3>
                   <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                    <a href="tel:+15551234567" className="hover:underline">+1 (555) 123-4567</a>
+                    <a href="tel:+15551234567" className="hover:underline">+91 9999999999</a>
                   </p>
                   <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                     Monday-Friday, 9AM-5PM PT
@@ -325,7 +325,7 @@ function Contact() {
       {/* Map section */}
       <div className="map-section">
         <iframe 
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.1034212475854!2d-122.4194160842856!3d37.77492997976018!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x808f7e3c5428e1e7%3A0x3039ab22b65a3324!2sSan%20Francisco%2C%20CA%2094107!5e0!3m2!1sen!2sus!4v1624982472059!5m2!1sen!2sus" 
+          src="https://www.google.com/maps/place/Ashram+Metro+Gate+No+2/@28.5732325,77.256252,17z/data=!3m1!4b1!4m6!3m5!1s0x390ce3003d4bd497:0xbd5683d8a625291a!8m2!3d28.5732325!4d77.2588269!16s%2Fg%2F11lp5x47kk?entry=ttu&g_ep=EgoyMDI1MDkwOS4wIKXMDSoASAFQAw%3D%3D" 
           width="100%" 
           height="450" 
           style={{ border: 0 }} 

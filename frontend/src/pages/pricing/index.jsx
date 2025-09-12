@@ -12,8 +12,8 @@ function Pricing() {
           <div className="pricing-header">
             <h2>Basic</h2>
             <div className="pricing-price">
-              <span className="currency">$</span>
-              <span className="amount">29</span>
+              <span className="currency">₹</span>
+              <span className="amount">99</span>
               <span className="period">/month</span>
             </div>
           </div>
@@ -34,8 +34,8 @@ function Pricing() {
           <div className="pricing-header">
             <h2>Professional</h2>
             <div className="pricing-price">
-              <span className="currency">$</span>
-              <span className="amount">79</span>
+              <span className="currency">₹</span>
+              <span className="amount">499</span>
               <span className="period">/month</span>
             </div>
           </div>
@@ -56,8 +56,8 @@ function Pricing() {
           <div className="pricing-header">
             <h2>Enterprise</h2>
             <div className="pricing-price">
-              <span className="currency">$</span>
-              <span className="amount">199</span>
+              <span className="currency">₹</span>
+              <span className="amount">999</span>
               <span className="period">/month</span>
             </div>
           </div>
