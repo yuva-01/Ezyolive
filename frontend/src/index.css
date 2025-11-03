@@ -2,53 +2,272 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import Google Fonts for Medical Professional Look */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&family=Lato:wght@300;400;700&display=swap');
+
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-800 font-sans;
+    @apply bg-gradient-to-br from-clinical-50 via-white to-primary-50/20 text-gray-800 font-sans antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold tracking-tight;
   }
   
   h1 {
-    @apply text-3xl font-bold text-gray-800 font-display;
+    @apply text-4xl lg:text-5xl xl:text-6xl bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent;
   }
   
   h2 {
-    @apply text-2xl font-bold text-gray-800 font-display;
+    @apply text-3xl lg:text-4xl text-gray-800;
   }
   
   h3 {
-    @apply text-xl font-bold text-gray-800 font-display;
+    @apply text-2xl lg:text-3xl text-gray-800;
   }
   
   h4 {
-    @apply text-lg font-bold text-gray-800;
+    @apply text-xl lg:text-2xl text-gray-700;
   }
   
   a {
-    @apply text-primary-600 hover:text-primary-700;
+    @apply text-primary-600 hover:text-primary-700 transition-colors duration-200;
+  }
+  
+  /* Selection styling */
+  ::selection {
+    @apply bg-primary-100 text-primary-900;
+  }
+  
+  /* Smooth scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary-400 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary-500;
   }
 }
 
 @layer components {
+  /* Medical-themed buttons */
   .btn {
-    @apply inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-xl shadow-sm text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0;
   }
   
   .btn-primary {
-    @apply btn bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+    @apply btn bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 focus:ring-primary-500 shadow-medical hover:shadow-glow;
   }
   
   .btn-secondary {
-    @apply btn bg-secondary-600 text-white hover:bg-secondary-700 focus:ring-secondary-500;
+    @apply btn bg-gradient-to-r from-secondary-500 to-secondary-600 text-white hover:from-secondary-600 hover:to-secondary-700 focus:ring-secondary-500 shadow-card hover:shadow-glow-green;
   }
   
   .btn-outline {
-    @apply btn border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-primary-500;
+    @apply btn border-2 border-primary-500 bg-white text-primary-600 hover:bg-primary-50 focus:ring-primary-500 hover:border-primary-600;
   }
   
   .btn-danger {
-    @apply btn bg-danger-600 text-white hover:bg-danger-700 focus:ring-danger-500;
+    @apply btn bg-gradient-to-r from-danger-500 to-danger-600 text-white hover:from-danger-600 hover:to-danger-700 focus:ring-danger-500 shadow-card;
   }
   
+  .btn-ghost {
+    @apply btn bg-transparent text-primary-600 hover:bg-primary-50 border-none shadow-none;
+  }
+  
+  /* Medical Cards */
+  .card {
+    @apply bg-white rounded-2xl shadow-card hover:shadow-elevated transition-all duration-300 border border-gray-100;
+  }
+  
+  .card-medical {
+    @apply card hover:border-primary-200 hover:shadow-medical;
+  }
+  
+  .card-interactive {
+    @apply card cursor-pointer transform hover:scale-[1.02] active:scale-[0.98];
+  }
+  
+  /* Input styles with medical theme */
+  .input {
+    @apply block w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 bg-white placeholder-gray-400;
+  }
+  
+  .input-error {
+    @apply input border-danger-500 focus:ring-danger-500 focus:border-danger-500;
+  }
+  
+  /* Badge styles */
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
+  }
+  
+  .badge-success {
+    @apply badge bg-success-100 text-success-800 border border-success-200;
+  }
+  
+  .badge-warning {
+    @apply badge bg-warning-100 text-warning-800 border border-warning-200;
+  }
+  
+  .badge-danger {
+    @apply badge bg-danger-100 text-danger-800 border border-danger-200;
+  }
+  
+  .badge-primary {
+    @apply badge bg-primary-100 text-primary-800 border border-primary-200;
+  }
+  
+  /* Medical-themed section */
+  .section-medical {
+    @apply py-16 lg:py-24 relative overflow-hidden;
+  }
+  
+  .section-medical::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-br from-primary-50/50 via-transparent to-secondary-50/30 pointer-events-none;
+  }
+  
+  /* Pulse animation for health indicators */
+  .pulse-health {
+    animation: pulse-health 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Container Utilities */
+  .container-medical {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-medical {
+    @apply py-20 md:py-24 lg:py-32;
+  }
+
+  /* Animation Utilities */
+  .float-slow {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animation-delay-500 {
+    animation-delay: 0.5s;
+  }
+
+  .animation-delay-1000 {
+    animation-delay: 1s;
+  }
+
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  /* Entrance Animations */
+  .entrance-1 {
+    animation: fadeInUp 0.6s ease-out 0.1s both;
+  }
+
+  .entrance-2 {
+    animation: fadeInUp 0.6s ease-out 0.2s both;
+  }
+
+  .entrance-3 {
+    animation: fadeInUp 0.6s ease-out 0.3s both;
+  }
+
+  .entrance-4 {
+    animation: fadeInUp 0.6s ease-out 0.4s both;
+  }
+
+  .entrance-5 {
+    animation: fadeInUp 0.6s ease-out 0.5s both;
+  }
+  
+  @keyframes pulse-health {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.05);
+    }
+  }
+  
+  /* Medical icon container */
+  .icon-medical {
+    @apply w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white shadow-medical;
+  }
+  
+  .icon-success {
+    @apply w-12 h-12 rounded-xl bg-gradient-to-br from-success-500 to-success-600 flex items-center justify-center text-white shadow-card;
+  }
+  
+  /* Gradient text */
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent;
+  }
+  
+  .text-gradient-health {
+    @apply bg-gradient-to-r from-secondary-600 to-teal-600 bg-clip-text text-transparent;
+  }
+  
+  /* Shimmer loading effect */
+  .shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  
+  /* Floating animation for hero elements */
+  .float-medical {
+    animation: float-medical 3s ease-in-out infinite;
+  }
+  
+  @keyframes float-medical {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(3deg); }
+  }
+  
+  /* Medical trust indicators */
+  .trust-badge {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 backdrop-blur-sm border border-primary-200 shadow-soft;
+  }
+  
+  /* Hover glow effect */
+  .hover-glow {
+    @apply transition-all duration-300;
+  }
+  
+  .hover-glow:hover {
+    @apply shadow-glow;
+  }
+  
+  /* Container with medical branding */
+  .container-medical {
+    @apply container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl;
+  }
+
   .input {
     @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm;
   }
@@ -75,6 +294,61 @@
   
   .badge-info {
     @apply badge bg-blue-100 text-blue-800;
+  }
+
+  .pulse-health {
+    animation: pulse-health 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Container Utilities */
+  .container-medical {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-medical {
+    @apply py-20 md:py-24 lg:py-32;
+  }
+
+  /* Animation Utilities */
+  .float-slow {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animation-delay-500 {
+    animation-delay: 0.5s;
+  }
+
+  .animation-delay-1000 {
+    animation-delay: 1s;
+  }
+
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  /* Entrance Animations */
+  .entrance-1 {
+    animation: fadeInUp 0.6s ease-out 0.1s both;
+  }
+
+  .entrance-2 {
+    animation: fadeInUp 0.6s ease-out 0.2s both;
+  }
+
+  .entrance-3 {
+    animation: fadeInUp 0.6s ease-out 0.3s both;
+  }
+
+  .entrance-4 {
+    animation: fadeInUp 0.6s ease-out 0.4s both;
+  }
+
+  .entrance-5 {
+    animation: fadeInUp 0.6s ease-out 0.5s both;
   }
 }
 

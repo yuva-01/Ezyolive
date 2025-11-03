@@ -9,8 +9,8 @@ import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
 import AuthLayout from './layouts/AuthLayout';
 import MainLayout from './layouts/MainLayout';
-import PublicLayout from './layouts/public/PublicLayout';
-import Home from './pages/home/Home';
+import PublicLayout from './layouts/public/PublicLayout-Medical';
+import Home from './pages/home/Home-Medical';
 import Dashboard from './pages/dashboard/Dashboard';
 import AppointmentList from './pages/appointments/AppointmentList';
 import AppointmentForm from './pages/appointments/AppointmentForm';
@@ -20,6 +20,7 @@ import Contact from './pages/contact';
 import About from './pages/about';
 import './styles/theme.css';
 import './styles/animations.css';
+import './styles/medical-animations.css';
 import './styles/tailwind-custom.css';
 
 // Protected route wrapper component
