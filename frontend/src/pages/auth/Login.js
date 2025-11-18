@@ -67,7 +67,14 @@ const Login = () => {
   });
 
   const handleSubmit = (values) => {
-    dispatch(login(values));
+    const payload = {
+      email: values.email,
+      password: values.password,
+      rememberMe: values.rememberMe,
+      role: (values.role || 'patient').trim().toLowerCase(),
+    };
+
+    dispatch(login(payload));
   };
 
   useEffect(() => {

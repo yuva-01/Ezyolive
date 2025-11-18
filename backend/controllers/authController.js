@@ -2,6 +2,67 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const Log = require('../models/logModel');
 
+const allowedRoles = ['patient', 'doctor'];
+
+const normalizeRole = (value) => {
+  if (!value || typeof value !== 'string') {
+    return 'patient';
+  }
+
+  const sanitized = value.trim().toLowerCase();
+  return allowedRoles.includes(sanitized) ? sanitized : 'patient';
+};
+
+const deriveRole = (role, extras = {}) => {
+  const normalized = normalizeRole(role);
+
+  if (normalized === 'patient') {
+    const { specialization, licenseNumber, yearsOfExperience } = extras;
+    if (specialization || licenseNumber || yearsOfExperience) {
+      return 'doctor';
+    }
+  }
+
+  return normalized;
+};
+
+const hasDoctorProfile = (source = {}) => {
+  const specialization = typeof source.specialization === 'string'
+    ? source.specialization.trim()
+    : source.specialization;
+  const licenseNumber = typeof source.licenseNumber === 'string'
+    ? source.licenseNumber.trim()
+    : source.licenseNumber;
+  const yearsCandidate = source.yearsOfExperience ?? source.years ?? source.experience;
+  const years = Number(yearsCandidate);
+
+  return Boolean(
+    (specialization && specialization.length > 0) ||
+    (licenseNumber && licenseNumber.length > 0) ||
+    (Number.isFinite(years) && years > 0)
+  );
+};
+
+const ensureDoctorRole = async (user, context = {}) => {
+  if (!user || user.role === 'doctor') return user;
+
+  const bodyHasDoctorData = hasDoctorProfile(context.body || {});
+  const userHasDoctorData = hasDoctorProfile(user);
+  const requestedDoctor = context.requestedRole === 'doctor';
+
+  if (!(userHasDoctorData || bodyHasDoctorData)) {
+    return user;
+  }
+
+  if (!requestedDoctor && !userHasDoctorData) {
+    return user;
+  }
+
+  user.role = 'doctor';
+  await user.save({ validateBeforeSave: false });
+  return user;
+};
+
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN
@@ -56,8 +117,16 @@ exports.signup = async (req, res, next) => {
       });
     }
 
-    const allowedRoles = ['patient', 'doctor'];
-    const userRole = allowedRoles.includes(role) ? role : 'patient';
+    const sanitizedSpecialization = specialization ? specialization.trim() : undefined;
+    const sanitizedLicense = licenseNumber ? licenseNumber.trim() : undefined;
+    const parsedYears = Number(yearsOfExperience);
+    const sanitizedYears = Number.isFinite(parsedYears) && parsedYears > 0 ? parsedYears : undefined;
+
+    const userRole = deriveRole(role, {
+      specialization: sanitizedSpecialization,
+      licenseNumber: sanitizedLicense,
+      yearsOfExperience: sanitizedYears,
+    });
 
     if (userRole === 'doctor') {
       if (!specialization || !licenseNumber) {
@@ -78,9 +147,19 @@ exports.signup = async (req, res, next) => {
       dateOfBirth,
       gender,
       address,
-      specialization: userRole === 'doctor' ? specialization : undefined,
-      licenseNumber: userRole === 'doctor' ? licenseNumber : undefined,
-      yearsOfExperience: userRole === 'doctor' ? yearsOfExperience : undefined
+      specialization: sanitizedSpecialization,
+      licenseNumber: sanitizedLicense,
+      yearsOfExperience: sanitizedYears
+    });
+
+    // Safeguard against schema defaults overwriting doctor role
+    await ensureDoctorRole(newUser, {
+      requestedRole: userRole,
+      body: {
+        specialization: sanitizedSpecialization,
+        licenseNumber: sanitizedLicense,
+        yearsOfExperience: sanitizedYears,
+      },
     });
 
     // Log user creation
@@ -106,6 +185,7 @@ exports.signup = async (req, res, next) => {
 exports.login = async (req, res, next) => {
   try {
   const { email, password, role } = req.body;
+  const requestedRole = role ? normalizeRole(role) : undefined;
 
     // 1) Check if email and password exist
     if (!email || !password) {
@@ -136,8 +216,10 @@ exports.login = async (req, res, next) => {
       });
     }
 
+    await ensureDoctorRole(user, { requestedRole, body: req.body });
+
     // 3) Ensure requested role matches account role if provided
-    if (role && role !== user.role) {
+    if (requestedRole && requestedRole !== user.role) {
       return res.status(403).json({
         status: 'fail',
         message: `This account is registered as a ${user.role}. Please log in using the correct portal.`

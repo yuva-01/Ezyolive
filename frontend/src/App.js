@@ -14,6 +14,8 @@ import Home from './pages/home/Home-Medical';
 import Dashboard from './pages/dashboard/Dashboard';
 import AppointmentList from './pages/appointments/AppointmentList';
 import AppointmentForm from './pages/appointments/AppointmentForm';
+import Telehealth from './pages/telehealth';
+import Billing from './pages/billing';
 import Features from './pages/features';
 import Pricing from './pages/pricing';
 import Contact from './pages/contact';
@@ -103,6 +105,24 @@ const App = () => {
               <AppointmentForm />
             </ProtectedRoute>
           } 
+        />
+
+        {/* Patient experiences */}
+        <Route
+          path="/telehealth"
+          element={
+            <ProtectedRoute>
+              <Telehealth />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/billing"
+          element={
+            <ProtectedRoute>
+              <Billing />
+            </ProtectedRoute>
+          }
         />
       </Route>
     </Routes>

@@ -87,6 +87,7 @@ const Register = () => {
   });
 
   const handleSubmit = (values) => {
+    const normalizedRole = (values.role || 'patient').trim().toLowerCase();
     const userData = {
       firstName: values.firstName,
       lastName: values.lastName,
@@ -94,10 +95,10 @@ const Register = () => {
       password: values.password,
       confirmPassword: values.confirmPassword,
       agreeTerms: values.agreeTerms,
-      role: values.role,
-      specialization: values.role === 'doctor' ? values.specialization : undefined,
-      licenseNumber: values.role === 'doctor' ? values.licenseNumber : undefined,
-      yearsOfExperience: values.role === 'doctor' ? Number(values.yearsOfExperience) || undefined : undefined,
+      role: normalizedRole,
+      specialization: normalizedRole === 'doctor' ? values.specialization : undefined,
+      licenseNumber: normalizedRole === 'doctor' ? values.licenseNumber : undefined,
+      yearsOfExperience: normalizedRole === 'doctor' ? Number(values.yearsOfExperience) || undefined : undefined,
     };
 
     dispatch(register(userData));

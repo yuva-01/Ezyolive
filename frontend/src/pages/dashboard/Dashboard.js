@@ -318,6 +318,56 @@ const Dashboard = () => {
     },
   ];
 
+  const telehealthSessions = useMemo(
+    () =>
+      patientUpcomingAppointments.filter(
+        (appointment) => (appointment.type || '').toLowerCase() === 'telehealth'
+      ),
+    [patientUpcomingAppointments]
+  );
+
+  const telehealthSpotlight = telehealthSessions.length
+    ? {
+        label: 'Connection ready',
+        headline: `${formatAppointmentDate(telehealthSessions[0])} · ${formatAppointmentTime(telehealthSessions[0])}`,
+        subline: `${getDoctorDisplayName(telehealthSessions[0])} (${telehealthSessions[0].specialization || 'Care team'})`,
+        meta: telehealthSessions[0].reason || 'Virtual care session',
+      }
+    : {
+        label: 'No virtual visits',
+        headline: 'Need a remote check-in?',
+        subline: 'Book a telehealth appointment and connect from anywhere.',
+        meta: null,
+      };
+
+  const patientBillingSnapshot = useMemo(() => {
+    if (demoMode) {
+      return {
+        outstanding: 128.5,
+        nextDue: 'Dec 05, 2025',
+        method: 'Visa ···· 4242',
+        autopay: true,
+        lastPayment: 'Nov 12 · $45 copay',
+      };
+    }
+    return {
+      outstanding: Math.max(0, (appointments?.length || 0) * 20),
+      nextDue: 'No invoices due',
+      method: 'Add payment method',
+      autopay: false,
+      lastPayment: appointments?.length ? 'Processing recent visit' : 'No payments recorded',
+    };
+  }, [appointments, demoMode]);
+
+  const patientCareTasks = useMemo(
+    () => [
+      { id: 'task-1', label: 'Log blood pressure reading', due: 'Today · 6pm', completed: false },
+      { id: 'task-2', label: 'Review nutrition guide', due: 'Tomorrow · Anytime', completed: false },
+      { id: 'task-3', label: 'Complete mood check-in', due: 'Fri · Morning', completed: true },
+    ],
+    []
+  );
+
   const nextAppointmentSummary = nextAppointment
     ? (() => {
         const doctorLabel = getDoctorDisplayName(nextAppointment);
@@ -786,6 +836,108 @@ const Dashboard = () => {
                   {isBooking ? 'Sending request…' : 'Book appointment'}
                 </button>
               </form>
+            </div>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className={`${cardSurfaceClass} rounded-2xl p-6 relative overflow-hidden`}>
+              <div className="absolute inset-0 pointer-events-none opacity-30" aria-hidden="true">
+                <div className="absolute -right-10 top-0 h-32 w-32 rounded-full bg-indigo-300 blur-3xl"></div>
+                <div className="absolute -left-10 bottom-0 h-32 w-32 rounded-full bg-cyan-300 blur-3xl"></div>
+              </div>
+              <p className={`text-xs font-semibold uppercase tracking-[0.3em] ${isDark ? 'text-indigo-200' : 'text-indigo-600'}`}>
+                Telehealth
+              </p>
+              <h3 className={`mt-2 text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                {telehealthSpotlight.headline}
+              </h3>
+              <p className={`mt-1 text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{telehealthSpotlight.subline}</p>
+              {telehealthSpotlight.meta && (
+                <p className={`mt-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${isDark ? 'bg-white/10 text-white' : 'bg-indigo-50 text-indigo-600'}`}>
+                  {telehealthSpotlight.meta}
+                </p>
+              )}
+              <div className="mt-6 flex flex-wrap gap-3 text-sm">
+                <Link
+                  to="/telehealth"
+                  className={`inline-flex items-center rounded-full px-4 py-2 font-semibold ${isDark ? 'bg-white/10 text-white' : 'bg-white text-indigo-700 border border-indigo-100'}`}
+                >
+                  Open telehealth hub
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => navigate('/appointments/new')}
+                  className="inline-flex items-center rounded-full bg-gradient-to-r from-indigo-600 to-primary-500 px-4 py-2 font-semibold text-white shadow"
+                >
+                  Schedule virtual visit
+                </button>
+              </div>
+            </div>
+
+            <div className={`${cardSurfaceClass} rounded-2xl p-6`}>
+              <p className={`text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Billing snapshot</p>
+              <p className={`mt-4 text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                ${patientBillingSnapshot.outstanding.toFixed(2)}
+              </p>
+              <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Outstanding balance</p>
+              <div className="mt-4 space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className={isDark ? 'text-gray-300' : 'text-gray-600'}>Next due</span>
+                  <span className={isDark ? 'text-white' : 'text-gray-900'}>{patientBillingSnapshot.nextDue}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className={isDark ? 'text-gray-300' : 'text-gray-600'}>Payment method</span>
+                  <span className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{patientBillingSnapshot.method}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className={isDark ? 'text-gray-300' : 'text-gray-600'}>Autopay</span>
+                  <span className={`font-semibold ${patientBillingSnapshot.autopay ? 'text-emerald-500' : 'text-amber-500'}`}>
+                    {patientBillingSnapshot.autopay ? 'Enabled' : 'Off'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className={isDark ? 'text-gray-300' : 'text-gray-600'}>Last payment</span>
+                  <span className={isDark ? 'text-white' : 'text-gray-900'}>{patientBillingSnapshot.lastPayment}</span>
+                </div>
+              </div>
+              <Link
+                to="/billing"
+                className="mt-6 inline-flex items-center rounded-xl bg-gradient-to-r from-primary-600 to-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow"
+              >
+                Go to billing center
+              </Link>
+            </div>
+
+            <div className={`${cardSurfaceClass} rounded-2xl p-6`}>
+              <p className={`text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Care plan tasks</p>
+              <ul className="mt-4 space-y-3">
+                {patientCareTasks.map((task) => (
+                  <li key={task.id} className="flex items-start justify-between">
+                    <div className="flex items-start">
+                      <input
+                        type="checkbox"
+                        checked={task.completed}
+                        readOnly
+                        className="mt-1 h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                      />
+                      <div className="ml-3">
+                        <p className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{task.label}</p>
+                        <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{task.due}</p>
+                      </div>
+                    </div>
+                    <span className={`text-xs font-semibold ${task.completed ? 'text-emerald-500' : 'text-amber-500'}`}>
+                      {task.completed ? 'Done' : 'Due'}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <button
+                type="button"
+                onClick={() => navigate('/appointments/new')}
+                className="mt-6 inline-flex items-center rounded-xl border border-dashed border-primary-300 px-4 py-2 text-sm font-semibold text-primary-600"
+              >
+                Add care task
+              </button>
             </div>
           </div>
         </>

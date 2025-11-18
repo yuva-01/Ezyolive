@@ -10,6 +10,17 @@ const initialState = {
   message: '',
 };
 
+const normalizeAppointments = (payload) => {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.appointments)) return payload.appointments;
+  return [];
+};
+
+const normalizeAppointment = (payload) => {
+  if (!payload) return null;
+  return payload.appointment || payload;
+};
+
 // Get all appointments
 export const getAppointments = createAsyncThunk(
   'appointments/getAll',
@@ -128,7 +139,7 @@ export const appointmentSlice = createSlice({
       .addCase(getAppointments.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.appointments = action.payload;
+        state.appointments = normalizeAppointments(action.payload);
       })
       .addCase(getAppointments.rejected, (state, action) => {
         state.isLoading = false;
@@ -141,7 +152,10 @@ export const appointmentSlice = createSlice({
       .addCase(createAppointment.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.appointments.push(action.payload);
+        const newAppointment = normalizeAppointment(action.payload);
+        if (newAppointment) {
+          state.appointments.push(newAppointment);
+        }
       })
       .addCase(createAppointment.rejected, (state, action) => {
         state.isLoading = false;
@@ -154,7 +168,7 @@ export const appointmentSlice = createSlice({
       .addCase(getAppointment.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.appointment = action.payload;
+        state.appointment = normalizeAppointment(action.payload);
       })
       .addCase(getAppointment.rejected, (state, action) => {
         state.isLoading = false;
@@ -167,8 +181,10 @@ export const appointmentSlice = createSlice({
       .addCase(updateAppointment.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
+        const updatedAppointment = normalizeAppointment(action.payload);
+        if (!updatedAppointment) return;
         state.appointments = state.appointments.map((appointment) =>
-          appointment._id === action.payload._id ? action.payload : appointment
+          appointment._id === updatedAppointment._id ? updatedAppointment : appointment
         );
       })
       .addCase(updateAppointment.rejected, (state, action) => {
@@ -182,8 +198,10 @@ export const appointmentSlice = createSlice({
       .addCase(deleteAppointment.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
+        const removedAppointment = normalizeAppointment(action.payload);
+        if (!removedAppointment?._id) return;
         state.appointments = state.appointments.filter(
-          (appointment) => appointment._id !== action.payload._id
+          (appointment) => appointment._id !== removedAppointment._id
         );
       })
       .addCase(deleteAppointment.rejected, (state, action) => {

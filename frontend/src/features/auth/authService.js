@@ -30,6 +30,15 @@ const normalizeAuthPayload = (payload) => {
   return normalized;
 };
 
+const ensureRoleMatch = (serverRole, requestedRole) => {
+  if (!requestedRole || !serverRole) return;
+  if (requestedRole === serverRole) return;
+  const message = `This account is registered as a ${serverRole}. Please sign in through the ${serverRole} portal.`;
+  const error = new Error(message);
+  error.response = { data: { message } };
+  throw error;
+};
+
 const persistAuthUser = (payload, { demo = false } = {}) => {
   const normalized = normalizeAuthPayload(payload);
   if (!normalized) return null;
@@ -77,6 +86,8 @@ const login = async (userData) => {
     const demoResponse = authenticateDemo(userData);
     
     if (demoResponse) {
+      const roleFromResponse = demoResponse?.data?.user?.role || demoResponse?.role;
+      ensureRoleMatch(roleFromResponse, userData.role);
       return persistAuthUser(demoResponse, { demo: true });
     }
 
@@ -87,6 +98,8 @@ const login = async (userData) => {
   const response = await axios.post(API_URL + 'login', userData);
 
   if (response.data) {
+    const roleFromResponse = response.data?.data?.user?.role || response.data?.role;
+    ensureRoleMatch(roleFromResponse, userData.role);
     disableDemo();
     return persistAuthUser(response.data);
   }

@@ -3,18 +3,21 @@ import authService from './authService';
 
 const parseStoredUser = (payload) => {
   if (!payload) return null;
+
   if (payload.data?.user) {
     return {
       ...payload.data.user,
       token: payload.token,
     };
   }
+
   if (payload.user && !payload.firstName) {
     return {
       ...payload.user,
       token: payload.token,
     };
   }
+
   return payload;
 };
 
