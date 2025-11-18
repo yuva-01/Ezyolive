@@ -43,6 +43,27 @@ const hasDoctorProfile = (source = {}) => {
   );
 };
 
+const sanitizeDoctorProfile = (source = {}) => {
+  const specialization = typeof source.specialization === 'string' ? source.specialization.trim() : '';
+  const licenseNumber = typeof source.licenseNumber === 'string' ? source.licenseNumber.trim() : '';
+  const yearsCandidate = source.yearsOfExperience ?? source.years ?? source.experience;
+  const parsedYears = Number(yearsCandidate);
+
+  return {
+    specialization: specialization || undefined,
+    licenseNumber: licenseNumber || undefined,
+    yearsOfExperience: Number.isFinite(parsedYears) && parsedYears > 0 ? parsedYears : undefined,
+  };
+};
+
+const resolveSignupRole = (requestedRole, doctorProfile = {}) => {
+  if (requestedRole === 'doctor') {
+    return 'doctor';
+  }
+
+  return hasDoctorProfile(doctorProfile) ? 'doctor' : requestedRole;
+};
+
 const ensureDoctorRole = async (user, context = {}) => {
   if (!user || user.role === 'doctor') return user;
 
@@ -117,19 +138,17 @@ exports.signup = async (req, res, next) => {
       });
     }
 
-    const sanitizedSpecialization = specialization ? specialization.trim() : undefined;
-    const sanitizedLicense = licenseNumber ? licenseNumber.trim() : undefined;
-    const parsedYears = Number(yearsOfExperience);
-    const sanitizedYears = Number.isFinite(parsedYears) && parsedYears > 0 ? parsedYears : undefined;
-
-    const userRole = deriveRole(role, {
-      specialization: sanitizedSpecialization,
-      licenseNumber: sanitizedLicense,
-      yearsOfExperience: sanitizedYears,
+    const doctorProfile = sanitizeDoctorProfile({
+      specialization,
+      licenseNumber,
+      yearsOfExperience,
     });
 
+    const requestedRole = normalizeRole(role);
+    const userRole = resolveSignupRole(requestedRole, doctorProfile);
+
     if (userRole === 'doctor') {
-      if (!specialization || !licenseNumber) {
+      if (!doctorProfile.specialization || !doctorProfile.licenseNumber) {
         return res.status(400).json({
           status: 'fail',
           message: 'Doctors must provide specialization and license number'
@@ -147,33 +166,38 @@ exports.signup = async (req, res, next) => {
       dateOfBirth,
       gender,
       address,
-      specialization: sanitizedSpecialization,
-      licenseNumber: sanitizedLicense,
-      yearsOfExperience: sanitizedYears
+      specialization: doctorProfile.specialization,
+      licenseNumber: doctorProfile.licenseNumber,
+      yearsOfExperience: doctorProfile.yearsOfExperience
     });
 
+    // Defensive guard: ensure the persisted document matches the resolved role
+    if (newUser.role !== userRole) {
+      newUser.role = userRole;
+      await newUser.save({ validateBeforeSave: false });
+    }
+
     // Safeguard against schema defaults overwriting doctor role
-    await ensureDoctorRole(newUser, {
+    const normalizedUser = await ensureDoctorRole(newUser, {
       requestedRole: userRole,
       body: {
-        specialization: sanitizedSpecialization,
-        licenseNumber: sanitizedLicense,
-        yearsOfExperience: sanitizedYears,
+        ...req.body,
+        ...doctorProfile,
       },
     });
 
     // Log user creation
     await Log.createLog({
-      user: newUser._id,
+      user: normalizedUser._id,
       action: 'create',
       resourceType: 'user',
-      resourceId: newUser._id,
+      resourceId: normalizedUser._id,
       description: 'New user registered',
       ipAddress: req.ip,
       userAgent: req.headers['user-agent']
     });
 
-    createSendToken(newUser, 201, req, res);
+    createSendToken(normalizedUser, 201, req, res);
   } catch (err) {
     res.status(400).json({
       status: 'fail',

@@ -43,7 +43,9 @@
       role: {
         type: String,
         enum: ['patient', 'doctor', 'admin'],
-        default: 'patient'
+        default: 'patient',
+        lowercase: true,
+        trim: true
       },
       address: {
         street: String,

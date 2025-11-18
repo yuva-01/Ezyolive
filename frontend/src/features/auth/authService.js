@@ -70,10 +70,19 @@ const register = async (userData) => {
   
   // Real API call
   const response = await axios.post(API_URL + 'signup', userData);
-  console.log('Registration response:', response);
   if (response.data) {
     disableDemo();
-    return persistAuthUser(response.data);
+    const persistedUser = persistAuthUser(response.data);
+
+    if (persistedUser && userData.role) {
+      const requestedRole = (userData.role || '').trim().toLowerCase();
+      if (!persistedUser.role || persistedUser.role !== requestedRole) {
+        persistedUser.role = requestedRole;
+        localStorage.setItem('user', JSON.stringify(persistedUser));
+      }
+    }
+
+    return persistedUser;
   }
 
   return null;
