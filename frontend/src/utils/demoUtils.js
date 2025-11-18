@@ -40,11 +40,15 @@ export const isInDemoMode = () => localStorage.getItem(DEMO_KEY) === 'true';
 
 /**
  * Authenticate user with demo credentials
- * Returns { token, user, message } or null
+ * Returns shape similar to real API { status, token, data: { user } } or null
  */
-export const authenticateDemo = (email, password) => {
-  const found = DEMO_USERS.find(u => u.email === email && u.password === password);
+export const authenticateDemo = ({ email, password, role }) => {
+  const found = DEMO_USERS.find((u) => u.email === email && u.password === password);
   if (!found) return null;
+
+  if (role && role !== found.role) {
+    return null;
+  }
 
   const user = {
     id: found.id,
@@ -52,13 +56,16 @@ export const authenticateDemo = (email, password) => {
     lastName: found.lastName,
     email: found.email,
     role: found.role,
-    avatar: found.avatar
+    avatar: found.avatar,
   };
 
   return {
-    user,
+    status: 'success',
     token: 'demo-jwt-token-' + Date.now(),
-    message: 'Login successful in demo mode'
+    message: 'Login successful in demo mode',
+    data: {
+      user,
+    },
   };
 };
 
@@ -67,18 +74,26 @@ export const authenticateDemo = (email, password) => {
  * Returns { token, user, message }
  */
 export const registerDemo = (userData) => {
+  const normalizedRole = userData.role === 'doctor' ? 'doctor' : 'patient';
+
   const newUser = {
     id: 'demo-' + Date.now(),
     firstName: userData.firstName,
     lastName: userData.lastName,
     email: userData.email,
-    role: 'patient',
-    avatar: null
+    role: normalizedRole,
+    avatar: null,
+    specialization: normalizedRole === 'doctor' ? userData.specialization : undefined,
+    licenseNumber: normalizedRole === 'doctor' ? userData.licenseNumber : undefined,
+    yearsOfExperience: normalizedRole === 'doctor' ? userData.yearsOfExperience : undefined,
   };
 
   return {
-    user: newUser,
+    status: 'success',
     token: 'demo-jwt-token-' + Date.now(),
-    message: 'Registration successful in demo mode'
+    message: 'Registration successful in demo mode',
+    data: {
+      user: newUser,
+    },
   };
 };

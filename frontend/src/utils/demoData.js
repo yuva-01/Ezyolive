@@ -88,3 +88,24 @@ export const DEMO_RECENT_PATIENTS = [
     condition: 'Asthma'
   }
 ];
+
+export const DEMO_DOCTORS = [
+  {
+    id: 'doc-1',
+    firstName: 'Amelia',
+    lastName: 'Hart',
+    specialization: 'Cardiology'
+  },
+  {
+    id: 'doc-2',
+    firstName: 'Noah',
+    lastName: 'Singh',
+    specialization: 'Family Medicine'
+  },
+  {
+    id: 'doc-3',
+    firstName: 'Luna',
+    lastName: 'Garcia',
+    specialization: 'Dermatology'
+  }
+];

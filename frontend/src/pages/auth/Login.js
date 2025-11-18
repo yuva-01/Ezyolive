@@ -11,7 +11,7 @@ import {
   LockClosedIcon,
   SparklesIcon,
   ComputerDesktopIcon,
-  KeyIcon,
+  UserIcon,
 } from '@heroicons/react/24/outline';
 import { login, reset } from '../../features/auth/authSlice';
 import { useTheme } from '../../context/ThemeContext';
@@ -31,6 +31,21 @@ const trustSignals = [
   },
 ];
 
+const roleOptions = [
+  {
+    value: 'patient',
+    title: 'Patient Portal',
+    description: 'Book visits, attend telehealth sessions, and review care plans.',
+    icon: UserIcon,
+  },
+  {
+    value: 'doctor',
+    title: 'Doctor Workspace',
+    description: 'Manage schedules, monitor panels, and run virtual clinics.',
+    icon: ComputerDesktopIcon,
+  },
+];
+
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -42,11 +57,13 @@ const Login = () => {
     email: '',
     password: '',
     rememberMe: false,
+    role: 'patient',
   };
 
   const validationSchema = Yup.object({
     email: Yup.string().email('Invalid email address').required('Email is required'),
     password: Yup.string().required('Password is required'),
+    role: Yup.string().oneOf(['patient', 'doctor'], 'Please select a portal').required('Please select a portal'),
   });
 
   const handleSubmit = (values) => {
@@ -149,8 +166,63 @@ const Login = () => {
             {/* Form */}
             <div className="px-6 py-6">
               <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
-                {({ isValid, dirty }) => (
+                {({ values, isValid, dirty }) => (
                   <Form className="space-y-4">
+                    {/* Role Selection */}
+                    <div className="space-y-1.5">
+                      <label className={`text-sm font-semibold ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>
+                        Sign in as
+                      </label>
+                      <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                        Choose the portal that fits your role to see the right dashboard.
+                      </p>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        {roleOptions.map((option) => {
+                          const Icon = option.icon;
+                          const isActive = values.role === option.value;
+                          return (
+                            <label
+                              key={option.value}
+                              className={`relative block cursor-pointer rounded-2xl border px-4 py-3 transition-all duration-200 ${
+                                isActive
+                                  ? 'border-primary-500 bg-primary-500/5 ring-2 ring-primary-500/20'
+                                  : isDark
+                                  ? 'border-gray-800 bg-gray-900/50 hover:border-primary-400/60'
+                                  : 'border-gray-200 bg-white hover:border-primary-200'
+                              }`}
+                            >
+                              <Field type="radio" name="role" value={option.value} className="sr-only" />
+                              <div className="flex items-start gap-3">
+                                <div
+                                  className={`flex h-10 w-10 items-center justify-center rounded-xl ${
+                                    isActive
+                                      ? 'bg-primary-500/20 text-primary-400'
+                                      : isDark
+                                      ? 'bg-gray-800 text-gray-400'
+                                      : 'bg-gray-100 text-gray-500'
+                                  }`}
+                                >
+                                  <Icon className="h-5 w-5" />
+                                </div>
+                                <div>
+                                  <p className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{option.title}</p>
+                                  <p className={`text-xs leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    {option.description}
+                                  </p>
+                                </div>
+                              </div>
+                              {isActive && (
+                                <span className="pointer-events-none absolute right-4 top-4 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary-500 text-[10px] font-bold text-white">
+                                  ✓
+                                </span>
+                              )}
+                            </label>
+                          );
+                        })}
+                      </div>
+                      <ErrorMessage name="role" component="p" className="text-xs text-red-500" />
+                    </div>
+
                     {/* Email Field */}
                     <div className="space-y-1.5">
                       <label htmlFor="email" className={`text-sm font-semibold ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>

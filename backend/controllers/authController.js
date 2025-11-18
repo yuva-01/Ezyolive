@@ -38,11 +38,14 @@ exports.signup = async (req, res, next) => {
       lastName,
       email,
       password,
-     confirmPassword,
+      confirmPassword,
       role,
       dateOfBirth,
       gender,
-      address
+      address,
+      specialization,
+      licenseNumber,
+      yearsOfExperience
     } = req.body;
 
     // Basic validation
@@ -53,9 +56,17 @@ exports.signup = async (req, res, next) => {
       });
     }
 
-    // Prevent role escalation - only allow patient role during signup
-    // Admin and doctor roles should be assigned by existing admins
-    const userRole = role === 'patient' ? role : 'patient';
+    const allowedRoles = ['patient', 'doctor'];
+    const userRole = allowedRoles.includes(role) ? role : 'patient';
+
+    if (userRole === 'doctor') {
+      if (!specialization || !licenseNumber) {
+        return res.status(400).json({
+          status: 'fail',
+          message: 'Doctors must provide specialization and license number'
+        });
+      }
+    }
 
     const newUser = await User.create({
       firstName,
@@ -66,7 +77,10 @@ exports.signup = async (req, res, next) => {
       role: userRole,
       dateOfBirth,
       gender,
-      address
+      address,
+      specialization: userRole === 'doctor' ? specialization : undefined,
+      licenseNumber: userRole === 'doctor' ? licenseNumber : undefined,
+      yearsOfExperience: userRole === 'doctor' ? yearsOfExperience : undefined
     });
 
     // Log user creation
@@ -91,7 +105,7 @@ exports.signup = async (req, res, next) => {
 
 exports.login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+  const { email, password, role } = req.body;
 
     // 1) Check if email and password exist
     if (!email || !password) {
@@ -122,7 +136,15 @@ exports.login = async (req, res, next) => {
       });
     }
 
-    // 3) Log successful login
+    // 3) Ensure requested role matches account role if provided
+    if (role && role !== user.role) {
+      return res.status(403).json({
+        status: 'fail',
+        message: `This account is registered as a ${user.role}. Please log in using the correct portal.`
+      });
+    }
+
+    // 4) Log successful login
     await Log.logLogin(
       user,
       req.ip,
@@ -130,7 +152,7 @@ exports.login = async (req, res, next) => {
       true
     );
 
-    // 4) If everything ok, send token to client
+    // 5) If everything ok, send token to client
     createSendToken(user, 200, req, res);
   } catch (err) {
     res.status(400).json({

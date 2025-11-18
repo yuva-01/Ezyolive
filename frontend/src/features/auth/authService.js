@@ -4,6 +4,48 @@ import { isInDemoMode, authenticateDemo, registerDemo, enableDemo, disableDemo }
 
 const API_URL = '/api/auth/';
 
+const normalizeAuthPayload = (payload) => {
+  if (!payload) return null;
+
+  const baseUser = payload.data?.user || payload.user || payload;
+  if (!baseUser) return null;
+
+  const normalized = {
+    ...baseUser,
+  };
+
+  const token = payload.token || baseUser.token;
+  if (token) {
+    normalized.token = token;
+  }
+
+  if (payload.status && !normalized.status) {
+    normalized.status = payload.status;
+  }
+
+  if (payload.message && !normalized.message) {
+    normalized.message = payload.message;
+  }
+
+  return normalized;
+};
+
+const persistAuthUser = (payload, { demo = false } = {}) => {
+  const normalized = normalizeAuthPayload(payload);
+  if (!normalized) return null;
+
+  localStorage.setItem('user', JSON.stringify(normalized));
+  if (normalized.token) {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${normalized.token}`;
+  }
+
+  if (demo) {
+    enableDemo();
+  }
+
+  return normalized;
+};
+
 // Register user
 const register = async (userData) => {
   // Use demo mode if enabled
@@ -11,56 +53,45 @@ const register = async (userData) => {
     const demoResponse = registerDemo(userData);
     
     if (demoResponse) {
-      localStorage.setItem('user', JSON.stringify(demoResponse));
-      // Set token in axios default headers for all requests
-      axios.defaults.headers.common['Authorization'] = `Bearer ${demoResponse.token}`;
-      enableDemo();
+      return persistAuthUser(demoResponse, { demo: true });
     }
     
-    return demoResponse;
+    return null;
   }
   
   // Real API call
   const response = await axios.post(API_URL + 'signup', userData);
   console.log('Registration response:', response);
   if (response.data) {
-    localStorage.setItem('user', JSON.stringify(response.data));
-    // Set token in axios default headers for all requests
-    axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+    disableDemo();
+    return persistAuthUser(response.data);
   }
 
-
-  return response.data;
+  return null;
 };
 
 // Login user
 const login = async (userData) => {
   // Use demo mode if enabled
   if (isInDemoMode()) {
-    const demoResponse = authenticateDemo(userData.email, userData.password);
+    const demoResponse = authenticateDemo(userData);
     
     if (demoResponse) {
-      localStorage.setItem('user', JSON.stringify(demoResponse));
-      // Set token in axios default headers for all requests
-      axios.defaults.headers.common['Authorization'] = `Bearer ${demoResponse.token}`;
-      return demoResponse;
-    } else {
-      throw new Error('Invalid email or password');
+      return persistAuthUser(demoResponse, { demo: true });
     }
+
+    throw new Error('Invalid email, password, or role');
   }
   
   // Real API call
   const response = await axios.post(API_URL + 'login', userData);
 
   if (response.data) {
-    localStorage.setItem('user', JSON.stringify(response.data));
-    
-    // Set token in axios default headers for all requests
-    axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-    enableDemo();
+    disableDemo();
+    return persistAuthUser(response.data);
   }
 
-  return response.data;
+  return null;
 };
 
 // Logout user
@@ -85,7 +116,8 @@ const logout = async () => {
 // Get current user
 const getCurrentUser = async () => {
   try {
-    const user = JSON.parse(localStorage.getItem('user'));
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const user = normalizeAuthPayload(storedUser);
 
     if (!user) {
       return null;

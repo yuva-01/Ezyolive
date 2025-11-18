@@ -12,6 +12,8 @@ import {
   ArrowRightIcon,
   SparklesIcon,
   BuildingOffice2Icon,
+  ComputerDesktopIcon,
+  UserIcon,
 } from '@heroicons/react/24/outline';
 import { register, reset } from '../../features/auth/authSlice';
 import { useTheme } from '../../context/ThemeContext';
@@ -20,6 +22,21 @@ const onboardingHighlights = [
   'Concierge launch with interoperability specialists',
   'FHIR, HL7, and SSO integrations ready to activate',
   'Continuous governance to keep data private and safe',
+];
+
+const roleOptions = [
+  {
+    value: 'patient',
+    title: 'Patient Portal',
+    description: 'Track care plans, message clinicians, and manage visits.',
+    icon: UserIcon,
+  },
+  {
+    value: 'doctor',
+    title: 'Doctor Workspace',
+    description: 'Coordinate schedules, virtual consults, and patient panels.',
+    icon: ComputerDesktopIcon,
+  },
 ];
 
 const Register = () => {
@@ -36,6 +53,10 @@ const Register = () => {
     password: '',
     confirmPassword: '',
     agreeTerms: false,
+    role: 'patient',
+    specialization: '',
+    licenseNumber: '',
+    yearsOfExperience: '',
   };
 
   const validationSchema = Yup.object({
@@ -45,6 +66,24 @@ const Register = () => {
     password: Yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
     confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match').required('Confirm password is required'),
     agreeTerms: Yup.boolean().oneOf([true], 'You must accept the terms and conditions'),
+    role: Yup.string().oneOf(['patient', 'doctor'], 'Select a role').required('Select a role'),
+    specialization: Yup.string().when('role', {
+      is: 'doctor',
+      then: (schema) => schema.required('Specialization is required for doctors'),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+    licenseNumber: Yup.string().when('role', {
+      is: 'doctor',
+      then: (schema) => schema.required('License number is required for doctors'),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+    yearsOfExperience: Yup.number()
+      .transform((value, originalValue) => (originalValue === '' ? undefined : value))
+      .when('role', {
+        is: 'doctor',
+        then: (schema) => schema.typeError('Enter years of experience').min(1, 'At least 1 year').required('Experience is required'),
+        otherwise: (schema) => schema.notRequired(),
+      }),
   });
 
   const handleSubmit = (values) => {
@@ -55,6 +94,10 @@ const Register = () => {
       password: values.password,
       confirmPassword: values.confirmPassword,
       agreeTerms: values.agreeTerms,
+      role: values.role,
+      specialization: values.role === 'doctor' ? values.specialization : undefined,
+      licenseNumber: values.role === 'doctor' ? values.licenseNumber : undefined,
+      yearsOfExperience: values.role === 'doctor' ? Number(values.yearsOfExperience) || undefined : undefined,
     };
 
     dispatch(register(userData));
@@ -129,8 +172,59 @@ const Register = () => {
 
         <div className="px-6 py-6">
           <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
-            {({ isValid, dirty }) => (
+            {({ values, isValid, dirty }) => (
               <Form className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className={`text-sm font-semibold ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>
+                    I am creating an account for
+                  </label>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {roleOptions.map((option) => {
+                      const Icon = option.icon;
+                      const isActive = values.role === option.value;
+                      return (
+                        <label
+                          key={option.value}
+                          className={`relative block cursor-pointer rounded-2xl border px-4 py-3 transition-all duration-200 ${
+                            isActive
+                              ? 'border-primary-500 bg-primary-500/5 ring-2 ring-primary-500/30'
+                              : isDark
+                              ? 'border-gray-800 bg-gray-900/50 hover:border-primary-400/60'
+                              : 'border-gray-200 bg-white hover:border-primary-200'
+                          }`}
+                        >
+                          <Field type="radio" name="role" value={option.value} className="sr-only" />
+                          <div className="flex items-start gap-3">
+                            <span
+                              className={`flex h-10 w-10 items-center justify-center rounded-xl ${
+                                isActive
+                                  ? 'bg-primary-500/20 text-primary-500'
+                                  : isDark
+                                  ? 'bg-gray-800 text-gray-300'
+                                  : 'bg-gray-100 text-gray-500'
+                              }`}
+                            >
+                              <Icon className="h-5 w-5" />
+                            </span>
+                            <div>
+                              <p className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{option.title}</p>
+                              <p className={`text-xs leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                                {option.description}
+                              </p>
+                            </div>
+                          </div>
+                          {isActive && (
+                            <span className="pointer-events-none absolute right-4 top-4 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary-500 text-[10px] font-bold text-white">
+                              ✓
+                            </span>
+                          )}
+                        </label>
+                      );
+                    })}
+                  </div>
+                  <ErrorMessage name="role" component="p" className="text-xs text-danger-500" />
+                </div>
+
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
                     <label htmlFor="firstName" className={`mb-2 block text-sm font-medium ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>
@@ -216,6 +310,56 @@ const Register = () => {
                     <ErrorMessage name="confirmPassword" component="p" className="mt-1 text-sm text-danger-500" />
                   </div>
                 </div>
+
+                {values.role === 'doctor' && (
+                  <div className={`rounded-2xl border px-4 py-4 ${isDark ? 'border-primary-500/40 bg-primary-500/5' : 'border-primary-100 bg-primary-50/50'}`}>
+                    <p className={`mb-3 text-sm font-semibold ${isDark ? 'text-primary-200' : 'text-primary-700'}`}>
+                      Doctor credentials
+                    </p>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="sm:col-span-2">
+                        <label htmlFor="specialization" className={`mb-2 block text-sm font-medium ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>
+                          Specialization
+                        </label>
+                        <Field
+                          id="specialization"
+                          name="specialization"
+                          type="text"
+                          className={`${inputBase} ${inputTheme}`}
+                          placeholder="Cardiology, Dermatology, etc."
+                        />
+                        <ErrorMessage name="specialization" component="p" className="mt-1 text-sm text-danger-500" />
+                      </div>
+                      <div>
+                        <label htmlFor="licenseNumber" className={`mb-2 block text-sm font-medium ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>
+                          License Number
+                        </label>
+                        <Field
+                          id="licenseNumber"
+                          name="licenseNumber"
+                          type="text"
+                          className={`${inputBase} ${inputTheme}`}
+                          placeholder="e.g., D1234567"
+                        />
+                        <ErrorMessage name="licenseNumber" component="p" className="mt-1 text-sm text-danger-500" />
+                      </div>
+                      <div>
+                        <label htmlFor="yearsOfExperience" className={`mb-2 block text-sm font-medium ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>
+                          Years of Experience
+                        </label>
+                        <Field
+                          id="yearsOfExperience"
+                          name="yearsOfExperience"
+                          type="number"
+                          min="1"
+                          className={`${inputBase} ${inputTheme}`}
+                          placeholder="10"
+                        />
+                        <ErrorMessage name="yearsOfExperience" component="p" className="mt-1 text-sm text-danger-500" />
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className={`rounded-2xl border px-4 py-3 ${isDark ? 'border-gray-700/70 bg-gray-900/70' : 'border-primary-100 bg-primary-50/40'}`}>
                   <label className="flex items-start gap-3 text-sm">

@@ -1,6 +1,7 @@
   const mongoose = require('mongoose');
   const bcrypt = require('bcryptjs');
   const validator = require('validator');
+  const crypto = require('crypto');
 
   const userSchema = new mongoose.Schema(
     {
@@ -59,24 +60,18 @@
       },
       specialization: {
         type: String,
-        // Only required for doctors
-        required: function() {
-          return this.role === 'doctor';
-        }
+        trim: true,
+        maxlength: 120
       },
       licenseNumber: {
         type: String,
-        // Only required for doctors
-        required: function() {
-          return this.role === 'doctor';
-        }
+        trim: true,
+        maxlength: 80
       },
       yearsOfExperience: {
         type: Number,
-        // Only applicable for doctors
-        default: function() {
-          return this.role === 'doctor' ? 0 : undefined;
-        }
+        min: 0,
+        default: undefined
       },
       medicalHistory: {
         allergies: [String],
