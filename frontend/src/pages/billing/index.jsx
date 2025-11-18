@@ -12,7 +12,10 @@ import {
 import { useTheme } from '../../context/ThemeContext';
 import { DEMO_UPCOMING_APPOINTMENTS } from '../../utils/demoData';
 
-const formatCurrency = (value) => `$${value.toFixed(2)}`;
+const formatCurrency = (value) => {
+  const num = Number(value) || 0;
+  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 2 }).format(num);
+};
 
 const formatDate = (value) => {
   if (!value) return 'TBD';

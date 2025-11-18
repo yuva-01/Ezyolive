@@ -15,6 +15,63 @@ import {
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
 
+// Small map/image component for the hero — tries geolocation then falls back to a hospital image
+const MapEmbed = ({ className }) => {
+  const [coords, setCoords] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!navigator || !navigator.geolocation) {
+      setError('Geolocation not supported');
+      return;
+    }
+
+    let mounted = true;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        if (mounted) setCoords(pos.coords);
+      },
+      (err) => {
+        if (mounted) setError(err.message || 'Unable to retrieve location');
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const fallbackImage = 'https://images.unsplash.com/photo-1580281657521-38b4a2f8b3c3?auto=format&fit=crop&w=1600&q=80';
+
+  if (coords) {
+    const lat = coords.latitude;
+    const lon = coords.longitude;
+    const q = encodeURIComponent(`clinic+near+${lat},${lon}`);
+    const src = `https://www.google.com/maps/search/${q}/@${lat},${lon},13z?output=embed`;
+    return (
+      <div className={`${className || ''} w-full h-96 sm:h-[420px] relative`}>
+        <iframe
+          title="Nearby clinics"
+          src={src}
+          className="w-full h-full border-0 rounded-lg"
+          allowFullScreen
+          loading="lazy"
+        />
+        <div className="absolute top-3 left-3 bg-white/90 text-xs rounded-full px-3 py-1 text-gray-800 shadow">Showing nearby clinics</div>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      className={`${className || ''} w-full h-full object-cover rounded-lg z-10`}
+      src={fallbackImage}
+      alt="Hospital and doctors"
+    />
+  );
+};
+
 const Home = () => {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [activeFaq, setActiveFaq] = useState(null);
@@ -240,12 +297,8 @@ const Home = () => {
                         <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/20 to-transparent rounded-t-xl"></div>
                         <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
                         
-                        {/* Main image with subtle border */}
-                        <img
-                          className="w-full h-full object-cover rounded-lg z-10 transform transition-transform duration-700 hover:scale-105 bg-gray-200"
-                          src="https://plus.unsplash.com/premium_photo-1658506671316-0b293df7c72b?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                          alt="Professional doctor portrait"
-                        />
+                        {/* Main image or map */}
+                        <MapEmbed className="w-full h-full rounded-lg z-10" />
                         
                         {/* Floating elements */}
                         <div className="absolute -top-4 -right-4 w-24 h-24 bg-blue-500/20 rounded-full blur-xl"></div>

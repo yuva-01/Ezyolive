@@ -28,6 +28,9 @@ function Contact() {
   
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [mapError, setMapError] = useState(false);
+
+  const mapEmbedUrl = 'https://maps.google.com/maps?q=Ashram%20Metro%20Gate%20No%202%2C%20New%20Delhi&z=15&output=embed';
 
   const subjects = [
     'General Inquiry',
@@ -323,16 +326,38 @@ function Contact() {
       </div>
       
       {/* Map section */}
-      <div className="map-section">
-        <iframe 
-          src="https://www.google.com/maps/place/Ashram+Metro+Gate+No+2/@28.5732325,77.256252,17z/data=!3m1!4b1!4m6!3m5!1s0x390ce3003d4bd497:0xbd5683d8a625291a!8m2!3d28.5732325!4d77.2588269!16s%2Fg%2F11lp5x47kk?entry=ttu&g_ep=EgoyMDI1MDkwOS4wIKXMDSoASAFQAw%3D%3D" 
-          width="100%" 
-          height="450" 
-          style={{ border: 0 }} 
-          allowFullScreen="" 
-          loading="lazy"
-          title="EzyOlive location"
-        ></iframe>
+      <div className={`map-section ${isDark ? 'map-section-dark' : ''}`}>
+        <div className="container">
+          <div className="map-card">
+            {!mapError ? (
+              <iframe
+                src={mapEmbedUrl}
+                title="EzyOlive location"
+                loading="lazy"
+                allowFullScreen
+                referrerPolicy="no-referrer-when-downgrade"
+                onError={() => setMapError(true)}
+              ></iframe>
+            ) : (
+              <div className="map-fallback">
+                <h3>Visit us in New Delhi</h3>
+                <p>
+                  159B, Ashram Metro Gate No. 2
+                  <br />
+                  New Delhi, India
+                </p>
+                <a
+                  href="https://maps.app.goo.gl/xzMZoUrrkTmt7a81A"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="map-link"
+                >
+                  Open in Google Maps
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* FAQ section */}

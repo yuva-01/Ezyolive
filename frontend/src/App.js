@@ -20,6 +20,8 @@ import Features from './pages/features';
 import Pricing from './pages/pricing';
 import Contact from './pages/contact';
 import About from './pages/about';
+import Patients from './pages/patients';
+import Analytics from './pages/analytics';
 import './styles/theme.css';
 import './styles/animations.css';
 import './styles/medical-animations.css';
@@ -105,6 +107,24 @@ const App = () => {
               <AppointmentForm />
             </ProtectedRoute>
           } 
+        />
+
+        <Route
+          path="/patients"
+          element={
+            <ProtectedRoute>
+              <Patients />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/analytics"
+          element={
+            <ProtectedRoute>
+              <Analytics />
+            </ProtectedRoute>
+          }
         />
 
         {/* Patient experiences */}

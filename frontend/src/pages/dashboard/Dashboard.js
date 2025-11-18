@@ -17,6 +17,18 @@ import { getAppointments, createAppointment } from '../../features/appointments/
 import { DEMO_STATS, DEMO_UPCOMING_APPOINTMENTS, DEMO_RECENT_PATIENTS, DEMO_DOCTORS } from '../../utils/demoData';
 import { isInDemoMode } from '../../utils/demoUtils';
 
+const formatCurrency = (amount, options = {}) => {
+  const { minimumFractionDigits = 0, maximumFractionDigits = 0 } = options;
+  const numericAmount = Number(amount);
+  const safeAmount = Number.isFinite(numericAmount) ? numericAmount : 0;
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    minimumFractionDigits,
+    maximumFractionDigits,
+  }).format(safeAmount);
+};
+
 const Dashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -347,7 +359,7 @@ const Dashboard = () => {
         nextDue: 'Dec 05, 2025',
         method: 'Visa ···· 4242',
         autopay: true,
-        lastPayment: 'Nov 12 · $45 copay',
+        lastPayment: 'Nov 12 · ₹45 copay',
       };
     }
     return {
@@ -479,7 +491,7 @@ const Dashboard = () => {
     },
     {
       name: 'Monthly Revenue',
-      value: `$${stats.revenue.thisMonth.toLocaleString()}`,
+      value: formatCurrency(stats.revenue.thisMonth),
       href: '/billing',
       icon: CurrencyDollarIcon,
       iconBg: 'bg-green-500',
@@ -877,7 +889,10 @@ const Dashboard = () => {
             <div className={`${cardSurfaceClass} rounded-2xl p-6`}>
               <p className={`text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Billing snapshot</p>
               <p className={`mt-4 text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                ${patientBillingSnapshot.outstanding.toFixed(2)}
+                {formatCurrency(patientBillingSnapshot.outstanding, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </p>
               <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Outstanding balance</p>
               <div className="mt-4 space-y-2 text-sm">

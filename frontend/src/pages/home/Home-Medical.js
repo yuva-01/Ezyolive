@@ -95,6 +95,84 @@ const testimonials = [
   },
 ];
 
+const MapEmbed = ({ className = '', height = 420 }) => {
+  const [coords, setCoords] = useState(null);
+  const [status, setStatus] = useState('pending');
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !navigator?.geolocation) {
+      setStatus('unsupported');
+      return;
+    }
+
+    let mounted = true;
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        if (!mounted) return;
+        setCoords(position.coords);
+        setStatus('success');
+      },
+      () => {
+        if (!mounted) return;
+        setStatus('denied');
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const fallbackImage = 'https://images.unsplash.com/photo-1527613426441-4da17471b66d?auto=format&fit=crop&w=1600&q=80';
+  const containerStyle = {
+    minHeight: `${height}px`,
+    height: '100%',
+  };
+
+  if (coords) {
+    const { latitude, longitude } = coords;
+    const q = encodeURIComponent(`hospital+clinic+near+${latitude},${longitude}`);
+
+    return (
+      <div className={`relative overflow-hidden ${className}`} style={containerStyle}>
+        <iframe
+          title="Nearby clinics"
+          src={`https://www.google.com/maps?q=${latitude},${longitude}&q=${q}&z=13&output=embed`}
+          className="absolute inset-0 h-full w-full border-0"
+          loading="lazy"
+          allowFullScreen
+        />
+        <div className="pointer-events-none absolute top-4 left-4 rounded-full bg-white/90 px-4 py-1 text-xs font-semibold text-primary-600 shadow">
+          Showing clinics near you
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`relative overflow-hidden ${className}`} style={containerStyle}>
+      <img
+        src={fallbackImage}
+        alt="Modern hospital team"
+        className="absolute inset-0 h-full w-full object-cover"
+        loading="lazy"
+      />
+      {status === 'pending' && (
+        <div className="absolute bottom-4 left-4 rounded-full bg-black/60 px-4 py-1 text-xs font-semibold text-white">
+          Locating nearby clinics…
+        </div>
+      )}
+      {status === 'denied' && (
+        <div className="absolute bottom-4 left-4 rounded-full bg-black/70 px-4 py-1 text-xs font-semibold text-white">
+          Location blocked · Showing featured hospital
+        </div>
+      )}
+    </div>
+  );
+};
+
 const Home = () => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -257,13 +335,7 @@ const Home = () => {
                     isDark ? 'border-gray-800/80 bg-gray-900/60' : 'border-white/40 bg-white/40'
                   } shadow-xl backdrop-blur-sm min-h-[420px]`}
                 >
-                  <img
-                    src="https://images.pexels.com/photos/8460118/pexels-photo-8460118.jpeg?auto=compress&cs=tinysrgb&w=1200&dpr=2"
-                    alt="Clinical team reviewing patient analytics together"
-                    className="h-full w-full min-h-[420px] object-cover"
-                    fetchpriority="high"
-                    loading="lazy"
-                  />
+                  <MapEmbed className="h-full w-full" height={420} />
                   <div className="absolute inset-0 bg-gradient-to-t from-gray-950/70 via-transparent to-transparent" />
                   <div className="absolute top-5 left-5 inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-xs font-semibold text-primary-600 shadow-lg shadow-primary-500/20">
                     <BoltIcon className="h-4 w-4" />

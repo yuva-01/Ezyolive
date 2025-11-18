@@ -327,9 +327,62 @@
   background-color: #f9fafb;
 }
 
-.map-section iframe {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  border-radius: 0.5rem;
+.map-section-dark {
+  background-color: #0f172a;
+}
+
+.map-card {
+  position: relative;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: 0 25px 50px rgba(15, 23, 42, 0.15);
+  min-height: 420px;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.08), rgba(16, 185, 129, 0.1));
+}
+
+.map-card iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  min-height: 420px;
+}
+
+.map-fallback {
+  padding: 3rem;
+  text-align: center;
+  color: #0f172a;
+}
+
+.dark-mode .map-fallback {
+  color: #f3f4f6;
+}
+
+.map-fallback h3 {
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+}
+
+.map-fallback p {
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+  font-size: 1rem;
+}
+
+.map-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #2563eb, #10b981);
+  text-decoration: none;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+}
+
+.map-link:hover {
+  transform: translateY(-2px);
 }
 
 /* FAQ section */
